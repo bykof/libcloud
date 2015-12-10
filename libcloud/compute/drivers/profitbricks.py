@@ -19,6 +19,8 @@ import base64
 import copy
 import time
 
+from profitbricks.client import ProfitBricksService
+
 try:
     from lxml import etree as ET
 except ImportError:
@@ -84,6 +86,11 @@ class ProfitBricksConnection(ConnectionUserAndKey):
     host = API_HOST
     api_prefix = API_VERSION
     responseCls = ProfitBricksResponse
+
+    def get_profit_bricksservice(self):
+        return ProfitBricksService(
+            username=self.user_id, password=self.key
+        )
 
     def add_default_headers(self, headers):
         headers['Content-Type'] = 'text/xml'
@@ -403,7 +410,7 @@ class ProfitBricksNodeDriver(NodeDriver):
         :param ex_availability_zone: The availability zone.
         :type ex_availability_zone: class: `ProfitBricksAvailabilityZone`
 
-        :param ex_ram: The amount of ram required.
+        :param ex_ram: The amount of rad required.
         :type ex_ram: : ``int``
 
         :param ex_cores: The number of cores required.
@@ -521,6 +528,23 @@ class ProfitBricksNodeDriver(NodeDriver):
                                        method='POST').object
         nodes = self._to_nodes(data)
         return nodes[0]
+
+    def create_volume_snapshot(self, volume, name=None):
+        """
+        Creates a snapshot of the storage volume.
+
+        :param volume: The StorageVolume to create a VolumeSnapshot from
+        :type volume: :class:`.VolumeSnapshot`
+
+        :param name: Name of created snapshot (optional)
+        :type name: `str`
+
+        :rtype: :class:`VolumeSnapshot`
+        """
+        return self.connection.get_profit_bricksservice.create_snapshot(
+            volume.extra['datacenter_id'], volume.id,
+            name=name, description='https://www.youtube.com/watch?v=sCNrK-n68CM'
+        )
 
     def destroy_node(self, node, ex_remove_attached_disks=False):
         """

@@ -250,7 +250,7 @@ class CoverageCommand(Command):
 
 forbid_publish()
 
-install_requires = []
+install_requires = ['profitbricks']
 if PY2_pre_26:
     install_requires.extend(['ssl', 'simplejson'])
 
